@@ -13,11 +13,11 @@ class Calculator:
 
     def get_today_stats(self):
         """Статистика за день"""
-        pass
+        return f'Денег потрачено сегодня: {sum([record.amount for record in self.records if record.date == dt.datetime.now()])}'
 
     def get_week_stats(self):
         """Статистика за неделю"""
-        pass
+        # return sum([record.amount for record in self.records if record.date >= dt.datetime.now() and  ])
 
 
 class Record:
@@ -78,3 +78,8 @@ cash_calculator.add_record(Record(amount=300, comment='бар в Танин др
 print(cash_calculator.get_today_cash_remained('euro'))
 # должно напечататься
 # На сегодня осталось 555 руб
+
+# Денег потрачено сегодня
+print(cash_calculator.get_today_stats())
+# Денег потрачено за неделю
+print(cash_calculator.get_week_stats())
