@@ -38,9 +38,6 @@ class CashCalculator(Calculator):
     USD_RATE = 74.30
     EURO_RATE = 89.59
 
-    def __init__(self, limit):
-        super().__init__(limit)
-
     def get_today_cash_remained(self, currency):
         """Сколько денег можно потратить сегодня в рублях, долларах или евро"""
 
@@ -58,9 +55,6 @@ class CashCalculator(Calculator):
 
 class CaloriesCalculator(Calculator):
     """Калькулятор для подсчёта калорий"""
-
-    def __init__(self, limit):
-        super().__init__(limit)
 
     def get_calories_remained(self):
         """Сколько калорий можно/нужно получить сегодня"""
