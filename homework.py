@@ -20,7 +20,8 @@ class Calculator:
         all_spent = []
 
         for rec in self.records:
-            if rec.date >= (dt.date.today() - dt.timedelta(days=6)) and (rec.date <= dt.date.today()):
+            if rec.date >= (dt.date.today() - dt.timedelta(days=6)) and \
+                    (rec.date <= dt.date.today()):
                 all_spent.append(rec.amount)
 
         return sum(all_spent)
@@ -33,8 +34,10 @@ class Record:
         # Поясняющий комментарий
         self.comment = comment
         # Дата создания записи
-        self.date = isinstance(date, str) and dt.datetime.strptime(date, '%d.%m.%Y').date() or date.date()
-
+        if isinstance(date, str):
+            self.date = dt.datetime.strptime(date, '%d.%m.%Y').date()
+        else:
+            self.date =  date.date()
 
 class CashCalculator(Calculator):
     """Калькулятор для подсчёта денег"""
@@ -69,8 +72,7 @@ class CashCalculator(Calculator):
         elif self.get_today_stats() > self.limit:
             self.balance = self.get_today_stats() - self.limit
             return f'Денег нет, держись: твой долг - {self.get_rates()}'
-        else:
-            return f'Денег нет, держись'
+        return 'Денег нет, держись'
 
 
 class CaloriesCalculator(Calculator):
@@ -78,9 +80,8 @@ class CaloriesCalculator(Calculator):
 
     def get_calories_remained(self):
         """Сколько калорий можно/нужно получить сегодня"""
-        text = f'Сегодня можно съесть что-нибудь ещё, но с общей калорийностью не более {self.limit - self.get_today_stats()} кКал'
+        state = self.limit - self.get_today_stats()
+        txt = 'Сегодня можно съесть что-нибудь ещё, но с общей калорийностью не более'
         if self.get_today_stats() < self.limit:
-            return text
-        else:
-            return f'Хватит есть!'
-
+            return f'{txt} {state} кКал'
+        return 'Хватит есть!'
