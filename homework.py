@@ -13,7 +13,8 @@ class Calculator:
 
     def get_today_stats(self):
         """Статистика за день"""
-        return sum([rec.amount for rec in self.records if rec.date == dt.date.today()])
+        return sum([rec.amount for rec in self.records
+                    if rec.date == dt.date.today()])
 
     def get_week_stats(self):
         """Статистика за последние 7 дней"""
@@ -37,7 +38,8 @@ class Record:
         if isinstance(date, str):
             self.date = dt.datetime.strptime(date, '%d.%m.%Y').date()
         else:
-            self.date =  date.date()
+            self.date = date.date()
+
 
 class CashCalculator(Calculator):
     """Калькулятор для подсчёта денег"""
@@ -81,7 +83,8 @@ class CaloriesCalculator(Calculator):
     def get_calories_remained(self):
         """Сколько калорий можно/нужно получить сегодня"""
         state = self.limit - self.get_today_stats()
-        txt = 'Сегодня можно съесть что-нибудь ещё, но с общей калорийностью не более'
+        txt = 'Сегодня можно съесть что-нибудь ещё, ' \
+              'но с общей калорийностью не более'
         if self.get_today_stats() < self.limit:
             return f'{txt} {state} кКал'
         return 'Хватит есть!'
