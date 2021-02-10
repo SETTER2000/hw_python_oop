@@ -2,25 +2,27 @@ import datetime as dt
 
 
 class Calculator:
+
     def __init__(self, limit):
         self.records = []
         self.limit: int = limit
+        self.__today = dt.date.today()
 
     def add_record(self, record: 'Record'):
         """Новая запись."""
         self.records.append(record)
 
-    def get_today_stats(self) -> int:
+    def get_today_stats(self):
         """Статистика за день."""
-        return sum([rec.amount if rec.date == dt.date.today()
+        return sum([rec.amount if rec.date == self.__today
                     else 0 for rec in self.records])
 
-    def get_week_stats(self) -> int:
+    def get_week_stats(self):
         """Статистика за последние 7 дней."""
         all_spent = []
-        week_ago = (dt.date.today() - dt.timedelta(days=6))
+        week_ago = (self.__today - dt.timedelta(days=6))
         for rec in self.records:
-            if rec.date >= week_ago and (rec.date <= dt.date.today()):
+            if rec.date >= week_ago and (rec.date <= self.__today):
                 all_spent.append(rec.amount)
 
         return sum(all_spent)
@@ -28,7 +30,7 @@ class Calculator:
 
 class Record:
     def __init__(self, amount, comment, date=None):
-        self.amount: int = amount
+        self.amount: float = amount
         self.comment: str = comment
         if date is None:
             self.date = (dt.datetime.now()).date()
@@ -52,19 +54,22 @@ class CashCalculator(Calculator):
 
     def get_rates(self) -> str:
         """Курс валюты."""
-        rate, name = self.currency_translate[self.currency]
-        return f'{"%.2f" % (self.balance / rate)} {name}'
+        self.balance = self.limit - self.get_today_stats()
+        if self.balance < 0:
+            self.balance = self.get_today_stats() - self.limit
+        rate, currency = self.currency_translate[self.currency]
+        balance = "%.2f" % (self.balance / rate)
+        return f'{balance} {currency}'
 
     def get_today_cash_remained(self, currency: str) -> str:
         """Доступно для трат сегодня в рублях, долларах или евро."""
         self.currency = currency
-        self.balance = self.limit - self.get_today_stats()
+        balance = self.get_rates()
 
         if self.get_today_stats() < self.limit:
-            return f'На сегодня осталось {self.get_rates()}'
+            return f'На сегодня осталось {balance}'
         elif self.get_today_stats() > self.limit:
-            self.balance = self.get_today_stats() - self.limit
-            return f'Денег нет, держись: твой долг - {self.get_rates()}'
+            return f'Денег нет, держись: твой долг - {balance}'
         return 'Денег нет, держись'
 
 
