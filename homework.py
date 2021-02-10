@@ -56,7 +56,7 @@ class CashCalculator(Calculator):
         return f'{"%.2f" % (self.balance / rate)} {name}'
 
     def get_today_cash_remained(self, currency: str) -> str:
-        """Сколько денег можно потратить сегодня в рублях, долларах или евро."""
+        """Доступно для трат сегодня в рублях, долларах или евро."""
         self.currency = currency
         self.balance = self.limit - self.get_today_stats()
 
@@ -74,7 +74,7 @@ class CaloriesCalculator(Calculator):
     def get_calories_remained(self) -> str:
         """Сколько калорий можно/нужно получить сегодня."""
         state = self.limit - self.get_today_stats()
-        txt = 'Сегодня можно съесть что-нибудь ещё, но с общей калорийностью не более'
+        tx = 'Сегодня можно съесть что-нибудь ещё, но с общей калорийностью не более'
         if self.get_today_stats() < self.limit:
-            return f'{txt} {state} кКал'
+            return f'{tx} {state} кКал'
         return 'Хватит есть!'
