@@ -74,7 +74,8 @@ class CaloriesCalculator(Calculator):
     def get_calories_remained(self) -> str:
         """Сколько калорий можно/нужно получить сегодня."""
         state = self.limit - self.get_today_stats()
-        tx = 'Сегодня можно съесть что-нибудь ещё, но с общей калорийностью не более'
+        txt = ['Сегодня можно съесть что-нибудь ещё, '
+               'но с общей калорийностью не более', f'{state}', 'кКал']
         if self.get_today_stats() < self.limit:
-            return f'{tx} {state} кКал'
+            return ' '.join(txt)
         return 'Хватит есть!'
