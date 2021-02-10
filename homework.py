@@ -4,68 +4,59 @@ import datetime as dt
 class Calculator:
     def __init__(self, limit):
         self.records = []
-        # Дневной лимит
-        self.limit = limit
+        self.limit: int = limit
 
-    def add_record(self, record):
-        """Новая запись"""
+    def add_record(self, record: 'Record'):
+        """Новая запись."""
         self.records.append(record)
 
-    def get_today_stats(self):
-        """Статистика за день"""
-        return sum([rec.amount for rec in self.records
-                    if rec.date == dt.date.today()])
+    def get_today_stats(self) -> int:
+        """Статистика за день."""
+        return sum([rec.amount if rec.date == dt.date.today()
+                    else 0 for rec in self.records])
 
-    def get_week_stats(self):
-        """Статистика за последние 7 дней"""
+    def get_week_stats(self) -> int:
+        """Статистика за последние 7 дней."""
         all_spent = []
-
+        week_ago = (dt.date.today() - dt.timedelta(days=6))
         for rec in self.records:
-            if rec.date >= (dt.date.today() - dt.timedelta(days=6)) and \
-                    (rec.date <= dt.date.today()):
+            if rec.date >= week_ago and (rec.date <= dt.date.today()):
                 all_spent.append(rec.amount)
 
         return sum(all_spent)
 
 
 class Record:
-    def __init__(self, amount, comment, date=dt.datetime.now()):
-        # Денежная сумма или количество килокалорий
-        self.amount = amount
-        # Поясняющий комментарий
-        self.comment = comment
-        # Дата создания записи
-        if isinstance(date, str):
-            self.date = dt.datetime.strptime(date, '%d.%m.%Y').date()
+    def __init__(self, amount, comment, date=None):
+        self.amount: int = amount
+        self.comment: str = comment
+        if date is None:
+            self.date = (dt.datetime.now()).date()
         else:
-            self.date = date.date()
+            self.date = dt.datetime.strptime(date, '%d.%m.%Y').date()
 
 
 class CashCalculator(Calculator):
-    """Калькулятор для подсчёта денег"""
-    USD_RATE = 74.30
-    EURO_RATE = 89.59
+    """Калькулятор для подсчёта денег."""
+    USD_RATE = 60.00
+    EURO_RATE = 70.00
+    RUB_RATE = 1
     currency = 'rub'
     balance = 0
 
     currency_translate = {
-        "usd": "USD",
-        "eur": "Euro",
-        "rub": "руб"
+        "usd": (USD_RATE, 'USD'),
+        "eur": (EURO_RATE, 'Euro'),
+        "rub": (RUB_RATE, 'руб')
     }
 
-    def get_rates(self):
-        if self.currency == 'usd':
-            rates = self.balance / self.USD_RATE
-        elif self.currency == 'eur':
-            rates = self.balance / self.EURO_RATE
-        else:
-            rates = self.balance
+    def get_rates(self) -> str:
+        """Курс валюты."""
+        rate, name = self.currency_translate[self.currency]
+        return f'{"%.2f" % (self.balance / rate)} {name}'
 
-        return f'{"%.2f" % rates} {self.currency_translate[self.currency]}'
-
-    def get_today_cash_remained(self, currency):
-        """Сколько денег можно потратить сегодня в рублях, долларах или евро"""
+    def get_today_cash_remained(self, currency: str) -> str:
+        """Сколько денег можно потратить сегодня в рублях, долларах или евро."""
         self.currency = currency
         self.balance = self.limit - self.get_today_stats()
 
@@ -78,13 +69,12 @@ class CashCalculator(Calculator):
 
 
 class CaloriesCalculator(Calculator):
-    """Калькулятор для подсчёта калорий"""
+    """Калькулятор для подсчёта калорий."""
 
-    def get_calories_remained(self):
-        """Сколько калорий можно/нужно получить сегодня"""
+    def get_calories_remained(self) -> str:
+        """Сколько калорий можно/нужно получить сегодня."""
         state = self.limit - self.get_today_stats()
-        txt = 'Сегодня можно съесть что-нибудь ещё, ' \
-              'но с общей калорийностью не более'
+        txt = 'Сегодня можно съесть что-нибудь ещё, но с общей калорийностью не более'
         if self.get_today_stats() < self.limit:
             return f'{txt} {state} кКал'
         return 'Хватит есть!'
